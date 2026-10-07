@@ -1,0 +1,359 @@
+/* ===== Paleta i czcionki ===== */
+:root {
+  --night: #0b0a24;
+  --cream: #fff3f6;
+  --blush: #ffd6e3;
+  --rose: #ff6f91;
+  --rose-deep: #c9184a;
+  --gold: #f6c96b;
+  --font-hand: 'Dancing Script', 'Snell Roundhand', 'Brush Script MT', cursive;
+  --font-fancy: 'Great Vibes', 'Dancing Script', 'Snell Roundhand', cursive;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--night);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--cream);
+  font-family: var(--font-hand);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ===== Niebo (stałe tło, iOS nie wspiera background-attachment: fixed) ===== */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 60% at 50% 115%, rgba(122, 52, 140, 0.55) 0%, transparent 60%),
+    radial-gradient(90% 55% at 15% -5%, rgba(40, 62, 150, 0.55) 0%, transparent 60%),
+    radial-gradient(70% 45% at 95% 20%, rgba(96, 40, 130, 0.35) 0%, transparent 65%),
+    linear-gradient(180deg, #070a22 0%, #100b2e 50%, #1d0f3a 100%);
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+}
+#bg { z-index: 1; }
+#fx { z-index: 4; }
+
+/* ===== Ekran startowy ===== */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
+  padding: 24px 16px;
+  text-align: center;
+  transition: opacity 0.9s ease, transform 0.9s ease, visibility 0s linear 0s;
+}
+.intro.hide {
+  opacity: 0;
+  transform: scale(1.06);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.9s ease, transform 0.9s ease, visibility 0s linear 0.9s;
+}
+
+.intro-title {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: clamp(2.3rem, 10vw, 4rem);
+  line-height: 1.15;
+  text-shadow: 0 0 22px rgba(255, 140, 180, 0.45), 0 2px 4px rgba(0, 0, 0, 0.5);
+  animation: fade-up 1.8s ease both;
+}
+
+.btn-open {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #fff;
+  padding: 0.85em 1.9em;
+  min-height: 56px;
+  border: 1px solid rgba(255, 220, 230, 0.5);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff7aa0 0%, #e0436f 55%, #b5174a 100%);
+  box-shadow: 0 0 0 0 rgba(255, 111, 145, 0.6), 0 8px 26px rgba(201, 24, 74, 0.45);
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: fade-up 1.8s 0.5s ease both, pulse 2.2s 2.3s ease-in-out infinite;
+}
+.btn-open:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+.btn-open:active { transform: scale(0.96); }
+
+@keyframes pulse {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(255, 111, 145, 0.55), 0 8px 26px rgba(201, 24, 74, 0.45); }
+  50%  { transform: scale(1.06); box-shadow: 0 0 0 18px rgba(255, 111, 145, 0), 0 10px 34px rgba(201, 24, 74, 0.6); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(255, 111, 145, 0), 0 8px 26px rgba(201, 24, 74, 0.45); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Scena z bukietem ===== */
+.scene {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+           max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  cursor: pointer; /* iOS wysyła "click" tylko do elementów, które wyglądają na klikalne */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.scene.on {
+  visibility: visible;
+  opacity: 1;
+}
+
+.bouquet-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+#bouquet {
+  height: clamp(250px, 52vh, 620px);
+  height: clamp(250px, 52svh, 620px);
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 400 / 520;
+  overflow: visible;
+}
+
+/* Rośnięcie łodyg: stroke-dashoffset */
+#bouquet .stem {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dashoffset: var(--off);
+  transition: stroke-dashoffset var(--t) cubic-bezier(0.5, 0.05, 0.35, 1) var(--d);
+}
+#bouquet.grow .stem { stroke-dashoffset: 0; }
+
+/* Rozwijanie liści / rozkwitanie płatków */
+#bouquet .pop {
+  transform: scale(0);
+  transform-origin: 0 0;
+  transition: transform var(--t) cubic-bezier(0.3, 1.45, 0.5, 1) var(--d);
+}
+#bouquet.grow .pop { transform: scale(1); }
+
+/* ===== Wiadomość ===== */
+.message {
+  width: 100%;
+  max-width: 34rem;
+  text-align: center;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.msg {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: clamp(1.42rem, 5.9vw, 2.15rem);
+  line-height: 1.36;
+  color: var(--cream);
+  text-shadow: 0 0 14px rgba(255, 120, 170, 0.38), 0 1px 3px rgba(0, 0, 0, 0.65);
+}
+.msg .w { white-space: nowrap; }
+.msg .ch {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.msg .ch.on { opacity: 1; }
+
+.caret {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1.05em;
+  vertical-align: -0.18em;
+}
+.caret::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+  animation: blink 1s steps(1) infinite;
+}
+.caret.end::after { animation: blink 1s steps(1) infinite, fade-out 1.4s ease forwards; }
+
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+
+.sig,
+.countdown,
+.hint {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+.sig.on,
+.countdown.on { opacity: 1; transform: none; }
+
+.sig {
+  font-family: var(--font-fancy);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 8.6vw, 3rem);
+  line-height: 1.2;
+  margin-top: 0.15em;
+  color: var(--gold);
+  text-shadow: 0 0 16px rgba(246, 201, 107, 0.45), 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.countdown {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: clamp(1.1rem, 4.6vw, 1.4rem);
+  margin-top: 0.35em;
+  color: var(--blush);
+}
+.countdown:empty { display: none; }
+.countdown b {
+  font-weight: 700;
+  font-size: 1.25em;
+  color: var(--gold);
+}
+
+.hint {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  margin-top: 0.9em;
+  color: rgba(255, 214, 227, 0.75);
+}
+.hint.on {
+  transform: none;
+  animation: hint-glow 2.6s ease-in-out infinite;
+}
+.hint.off {
+  opacity: 0 !important;
+  animation: none;
+  transition: opacity 0.6s ease;
+}
+@keyframes hint-glow {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.95; }
+}
+
+/* ===== Przycisk wyciszenia ===== */
+.mute {
+  position: fixed;
+  z-index: 6;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 220, 230, 0.35);
+  background: rgba(20, 14, 50, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: fade-up 0.8s ease both;
+}
+.mute[hidden] { display: none; }
+.mute:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.noscript {
+  position: fixed;
+  inset: auto 0 40% 0;
+  z-index: 10;
+  text-align: center;
+  font-size: 1.6rem;
+}
+
+/* ===== Szeroki ekran (desktop, telefon poziomo): bukiet obok wiadomości ===== */
+@media (min-aspect-ratio: 5/4) and (min-width: 600px) {
+  .scene {
+    flex-direction: row;
+    gap: clamp(12px, 4vw, 72px);
+  }
+  .bouquet-wrap { width: auto; }
+  #bouquet {
+    height: clamp(260px, 88vh, 780px);
+    height: clamp(260px, 88svh, 780px);
+  }
+  .message { flex: 0 1 32rem; }
+  .msg { font-size: clamp(1.25rem, 1.6vw + 1.6vh, 2.4rem); }
+  .sig { font-size: clamp(1.9rem, 2.2vw + 2.2vh, 3.4rem); }
+  .countdown { font-size: clamp(1rem, 1vw + 1.1vh, 1.6rem); }
+  .hint { font-size: clamp(0.95rem, 0.7vw + 0.9vh, 1.2rem); }
+}
+
+/* ===== Ograniczony ruch ===== */
+.reduced .btn-open { animation: fade-up 0.8s ease both; }
+.reduced #bouquet { opacity: 0; transition: opacity 1.6s ease; }
+.reduced #bouquet.grow { opacity: 1; }
+.reduced #bouquet .stem,
+.reduced #bouquet .pop { transition: none; }
+.reduced .msg .ch { transition: opacity 1.6s ease; }
+.reduced .hint.on { animation: none; opacity: 0.8; }
+.reduced .intro,
+.reduced .intro.hide { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-title,
+  .btn-open,
+  .mute { animation: none; }
+  .caret { display: none; }
+}
