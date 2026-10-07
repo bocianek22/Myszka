@@ -18,12 +18,12 @@ const CONFIG = {
   przycisk: 'Kliknij 💌',
 
   // Licznik „Do zobaczenia za X dni” — data w formacie RRRR-MM-DD
-  pokazLicznik: true,
+  pokazLicznik: false,
   dataPowrotu: '2026-12-20',
 
   // Muzyka: nazwa pliku leżącego obok index.html ('' = bez muzyki).
   // Jeśli pliku nie ma, strona po prostu działa bez dźwięku.
-  muzyka: 'muzyka.mp3',
+  muzyka: '',
   glosnosc: 0.6, // 0–1 (iPhone ignoruje i gra z głośnością systemową)
 
   // Szybkość pisania: średnia liczba milisekund na literę
